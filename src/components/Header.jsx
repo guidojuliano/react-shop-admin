@@ -1,22 +1,17 @@
 /* This example requires Tailwind CSS v2.0+ */
 import { Fragment } from 'react';
+import { useAuth } from '@hooks/useAuth';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
-import { BellIcon, Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import Link from 'next/link';
 
-const userData = {
-  name: 'Tom Cook',
-  email: 'tom@example.com',
-  imageUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-};
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', current: true },
+  { name: 'Dashboard', href: '/dashboard', current: false },
   { name: 'Productos', href: '/dashboard/products/', current: false },
-  { name: 'Ventas', href: '/.', current: false },
 ];
 const userNavigation = [
-  { name: 'Your Profile', href: './' },
-  { name: 'Settings', href: './' },
-  { name: 'Sign out', href: './' },
+  { name: 'Dashboard', href: '/dashboard/' },
+  { name: 'Products', href: '/dashboard/products' },
 ];
 
 function classNames(...classes) {
@@ -24,6 +19,13 @@ function classNames(...classes) {
 }
 
 export default function Header() {
+  const auth = useAuth();
+  const userData = {
+    name: auth?.user?.name,
+    email: auth?.user?.email,
+    imageUrl: auth?.user?.avatar,
+  };
+
   return (
     <>
       <Disclosure as="nav" className="bg-gray-800 relative z-50">
@@ -33,7 +35,9 @@ export default function Header() {
               <div className="flex items-center justify-between h-16">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
-                    <img className="h-8 w-8" src="https://tailwindui.com/img/logos/workflow-mark-indigo-500.svg" alt="Workflow" />
+                    <Link href="/">
+                      <img className="h-8 w-8" src="https://tailwindui.com/img/logos/workflow-mark-indigo-500.svg" alt="Workflow" />
+                    </Link>
                   </div>
                   <div className="hidden md:block">
                     <div className="ml-10 flex items-baseline space-x-4">
@@ -52,14 +56,6 @@ export default function Header() {
                 </div>
                 <div className="hidden md:block">
                   <div className="ml-4 flex items-center md:ml-6">
-                    <button
-                      type="button"
-                      className="bg-gray-800 p-1 rounded-full text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
-                    >
-                      <span className="sr-only">View notifications</span>
-                      <BellIcon className="h-6 w-6" aria-hidden="true" />
-                    </button>
-
                     {/* Profile dropdown */}
                     <Menu as="div" className="ml-3 relative">
                       <div>
@@ -78,15 +74,9 @@ export default function Header() {
                         leaveTo="transform opacity-0 scale-95"
                       >
                         <Menu.Items className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
-                          {userNavigation.map((item) => (
-                            <Menu.Item key={item.name}>
-                              {({ active }) => (
-                                <a href={item.href} className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}>
-                                  {item.name}
-                                </a>
-                              )}
-                            </Menu.Item>
-                          ))}
+                          <button onClick={() => auth.logout()} className="block px-4 py-2 text-sm text-gray-700">
+                            Logout
+                          </button>
                         </Menu.Items>
                       </Transition>
                     </Menu>
@@ -103,19 +93,6 @@ export default function Header() {
             </div>
 
             <Disclosure.Panel className="md:hidden">
-              <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                {navigation.map((item) => (
-                  <a
-                    key={item.name}
-                    as="a"
-                    href={item.href}
-                    className={classNames(item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white', 'block px-3 py-2 rounded-md text-base font-medium')}
-                    aria-current={item.current ? 'page' : undefined}
-                  >
-                    {item.name}
-                  </a>
-                ))}
-              </div>
               <div className="pt-4 pb-3 border-t border-gray-700">
                 <div className="flex items-center px-5">
                   <div className="flex-shrink-0">
@@ -125,13 +102,6 @@ export default function Header() {
                     <div className="text-base font-medium leading-none text-white">{userData.name}</div>
                     <div className="text-sm font-medium leading-none text-gray-400">{userData.email}</div>
                   </div>
-                  <button
-                    type="button"
-                    className="ml-auto bg-gray-800 flex-shrink-0 p-1 rounded-full text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
-                  >
-                    <span className="sr-only">View notifications</span>
-                    <BellIcon className="h-6 w-6" aria-hidden="true" />
-                  </button>
                 </div>
                 <div className="mt-3 px-2 space-y-1">
                   {userNavigation.map((item) => (

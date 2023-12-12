@@ -1,9 +1,17 @@
-import { Fragment, useRef } from 'react';
+import { Fragment, useRef, useEffect } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
-import { XCircleIcon } from '@heroicons/react/solid';
+import { XCircleIcon } from '@heroicons/react/24/solid';
 
-export default function Modal({ open, setOpen, children }) {
+export default function Modal({ open, setOpen, children, onModalClose }) {
   const cancelButtonRef = useRef(null);
+
+  useEffect(() => {
+    // Esta función se ejecuta cuando el modal se cierra
+    if (!open && typeof onModalClose === 'function') {
+      onModalClose();
+    }
+  }, [open, onModalClose]);
+
   return (
     <Transition.Root show={open} as={Fragment}>
       <Dialog as="div" className="fixed z-10 inset-0 overflow-y-auto" initialFocus={cancelButtonRef} onClose={setOpen}>
